@@ -5,7 +5,10 @@ import createPersistedState from 'vuex-persistedstate'
 export default createStore({
   state: {
     isGetterRouter:false,
-    isCollapse:false
+    isCollapse:false,
+    userInfo:{
+
+    }
   },
   getters: {
   },
@@ -15,6 +18,15 @@ export default createStore({
     },
     changeCollapsed(state){
       state.isCollapse = !state.isCollapse
+    },
+    changeUserInfo(state,value){
+      state.userInfo = {
+        ...state.userInfo,
+        ...value
+      }
+    },
+    clearUserInfo(state,value){
+      state.userInfo = {}
     }
   },
   actions: {
@@ -22,6 +34,7 @@ export default createStore({
   modules: {
   },
   plugins: [createPersistedState({
-    paths:["isCollapse"]//只讓側邊欄持久化
+    paths:["isCollapse","userInfo"]//讓側邊欄 用戶資料持久化
+
   })]
 })

@@ -5,7 +5,8 @@
             <span>自媒體交流中心</span>
         </div>
         <div class="right">
-            <span>歡迎回來 admin</span>
+            <span>歡迎回來 {{ store.state.userInfo.username
+ }}</span>
             <el-dropdown>
     <span class="el-dropdown-link">
         <el-icon :size="30" color="white"><User /></el-icon>
@@ -40,6 +41,7 @@
 
     const handleLogout = () =>{
         localStorage.removeItem('token') //清除token
+        store.commit("clearUserInfo")
         router.push('/login')
     }
 
