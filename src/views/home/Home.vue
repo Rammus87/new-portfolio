@@ -38,7 +38,11 @@ import { useStore } from "vuex";
 import { computed } from "vue";
 
 const store = useStore();
-const avatarUrl = computed(()=>store.state.userInfo.avatar?store.state.userInfo.avatar:`https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png`)
+const avatarUrl = computed(() =>
+  store.state.userInfo.avatar
+    ? 'http://localhost:3000' + store.state.userInfo.avatar
+    : `https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png`
+);
 const welcomeText = computed(()=>new Date().getHours() < 18?'努力創作,趕在晚上前完成':'好好休息,激發靈感')
 
 </script>

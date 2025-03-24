@@ -56,11 +56,15 @@
                 action=""
                 :show-file-list="false"
                 :auto-upload="false"
+                :on-change="handleChange"
               >
-                <img v-if="userForm.avatar" :src="userForm.avatar" class="avatar" />
+                <img v-if="userForm.avatar" :src="uploadAvatar" class="avatar" />
                 <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
               </el-upload>
             </el-form-item>
+            <el-form-item>
+          <el-button type="primary" @click="submitForm()">送出</el-button>
+        </el-form-item>
           </el-form>
         </el-card>
       </el-col>
@@ -72,13 +76,17 @@
 import { useStore } from "vuex";
 import { ref, computed, reactive } from "vue";
 import { Plus } from '@element-plus/icons-vue';
+import axios from "axios";
+import { ElMessage } from "element-plus";
 
 const store = useStore();
 const avatarUrl = computed(() =>
   store.state.userInfo.avatar
-    ? store.state.userInfo.avatar
+    ? 'http://localhost:3000' + store.state.userInfo.avatar
     : `https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png`
 );
+
+const uploadAvatar = computed(()=>userForm.avatar.includes('blob')?userForm.avatar:"http://localhost:3000" + userForm.avatar)
 
 const { username, gender, introduction, avatar } = store.state.userInfo;
 const userFormRef = ref();
@@ -87,6 +95,7 @@ const userForm = reactive({
   gender,
   introduction,
   avatar,
+  file:null
 });
 
 const userFormRules = reactive({
@@ -112,6 +121,40 @@ const options = [
     value: 2,
   },
 ];
+
+//每次選完圖片的回調
+const handleChange = (file)=>{
+  userForm.avatar = URL.createObjectURL(file.raw)
+  userForm.file = file.raw
+}
+
+//送出資料
+const submitForm = ()=>{
+  userFormRef.value.validate((valid)=>{
+    if(valid){
+      const params = new FormData()
+      for(let i in userForm){
+        params.append(i,userForm[i])
+      }
+      console.log(params)
+      axios.post("/adminapi/user/upload",params,{
+        headers:{
+          "Content-Type":"multipart/form-data"
+        }
+      }).then(res=>{
+        console.log("後端收到了",res.data)
+
+        if(res.data.ActionType === "OK"){
+          store.commit("changeUserInfo",res.data.data)
+          ElMessage.success("更新成功")
+        }
+      })
+    }
+  })
+}
+
+
+
 </script>
 
 <style scoped lang="scss">
@@ -141,5 +184,10 @@ const options = [
   width: 178px;
   height: 178px;
   text-align: center;
+}
+
+.avatar{
+  width: 178px;
+  height: 178px;
 }
 </style>
